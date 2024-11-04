@@ -10,6 +10,8 @@
 - 결과
 - 기여
 - 라이센스
+- OCR 엔진 요구사항
+- 성능 최적화
 
 
 ## 개요
@@ -32,13 +34,46 @@ cd KoreanText-Recognition
 ```
 pip install -r requirements.txt
 ```
-3. (선택 사항) OCR 엔진을 설치합니다. 일부 엔진은 추가 설정이 필요할 수 있으니, 공식 문서를 참조하세요.
+3. OCR 엔진을 설치합니다. 일부 엔진은 추가 설정이 필요할 수 있으니, 공식 문서를 참조하세요.
+
+### easyocr 설치
+
+https://www.jaided.ai/easyocr/install/
+
+
+### paddlepaddle 설치
+
+https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_en/quickstart_en.md#1-installation
+
+
+### tesseract 설치
+
+https://github.com/UB-Mannheim/tesseract/wiki
+
 
 ## 사용법
 1. 테스트할 한글 이미지 파일을 images/ 디렉토리에 넣습니다.
+
+```
+images/
+├── sample1.jpg
+├── sample1.json
+├── sample2.png
+├── sample2.json
+└── ...
+```
+
+JSON 파일의 형식은 다음과 같습니다:
+```
+{
+    "text": "실제 이미지에 있는 텍스트 내용",
+    "description": "이미지에 대한 설명(선택사항)"
+}
+```
+
 2. 비교 스크립트를 실행합니다:
 ```
-python compare_ocr.py
+python src/main.py
 ```
 3. 결과는 results/ 디렉토리에서 확인할 수 있습니다.
 
@@ -48,9 +83,6 @@ python compare_ocr.py
 - Tesseract OCR
 - PaddleOCR
 - EasyOCR
-- Anyline OCR (오픈소스이며 적합할 경우)
-- 기타 엔진 (필요에 따라 추가할 수 있습니다)
-각 엔진은 한글 텍스트에 최적화된 성능을 위해 구성됩니다.
 
 ## 결과
 결과 섹션에는 제공된 한글 이미지에 대한 각 OCR 엔진의 정확도 비교가 포함됩니다. 측정 항목은 다음과 같습니다:
@@ -73,3 +105,50 @@ git checkout -b feature-name
 
 ## 라이센스
 이 프로젝트는 MIT 라이센스에 따라 라이센스가 부여됩니다. 자세한 내용은 LICENSE 파일을 참조하세요.
+
+## OCR 엔진 요구사항
+
+### Tesseract OCR
+- 버전: 4.1.0 이상
+- GPU 필요 여부: 불필요
+- 최소 RAM: 4GB
+- 추가 설치 요구사항:
+  - Ubuntu: `sudo apt-get install tesseract-ocr tesseract-ocr-kor`
+  - macOS: `brew install tesseract tesseract-lang`
+  - Windows: [설치 프로그램](https://github.com/UB-Mannheim/tesseract/wiki)에서 다운로드
+
+### PaddleOCR
+- 버전: 2.6.0 이상
+- GPU 지원: 선택사항 (CUDA 10.2+ 권장)
+- 최소 RAM: 8GB
+- 설치 방법:
+  - GPU 버전: `pip install "paddlepaddle-gpu>=2.3.0"`
+  - CPU 버전: `pip install "paddlepaddle>=2.3.0"`
+
+### EasyOCR
+- 버전: 1.6.2 이상
+- GPU 지원: 선택사항 (CUDA 11.0+ 권장)
+- 최소 RAM: 8GB
+- 설치 방법:
+  - GPU 버전: 
+    ```bash
+    pip install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu116
+    pip install easyocr
+    ```
+  - CPU 버전:
+    ```bash
+    pip install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
+    pip install easyocr
+    ```
+
+## 성능 최적화
+각 OCR 엔진은 하드웨어 리소스에 따라 다르게 구성할 수 있습니다:
+
+### CPU 최적화
+- Tesseract: 기본적으로 CPU에 최적화되어 있습니다.
+- PaddleOCR: MKL-DNN 가속 및 멀티스레딩을 지원합니다.
+- EasyOCR: CPU 모드에서도 작동하나, 처리 속도가 느릴 수 있습니다.
+
+### GPU 최적화
+- PaddleOCR: CUDA 지원으로 처리 속도가 크게 향상됩니다.
+- EasyOCR: CUDA 지원으로 처리 속도가 크게 향상됩니다.

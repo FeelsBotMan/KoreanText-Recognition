@@ -36,7 +36,7 @@ class MetricsCalculator:
             ground_truth (str): 실제 정답 텍스트
             
         Returns:
-            float: 100자�� 오류 수
+            float: 100자당 오류 수
         """
         if not ground_truth:
             return 100.0
